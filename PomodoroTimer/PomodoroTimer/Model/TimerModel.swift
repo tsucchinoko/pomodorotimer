@@ -66,7 +66,7 @@ class TimerModel:ObservableObject {
     //1秒ごとに発動するタイマークラスのパブリッシュメソッド
     var timer = Timer.publish(every: 0.05, on: .main, in: .common).autoconnect()
     
-    var backgroundTaskId = UIBackgroundTaskIdentifier.init(rawValue: 0)
+//    var backgroundTaskId = UIBackgroundTaskIdentifier.init(rawValue: 0)
     
     var audioPlayer: AVAudioPlayer!
     var room: Room = roomData[0]
@@ -81,7 +81,7 @@ class TimerModel:ObservableObject {
         maxValue = duration
         self.room = room
         
-        self.backgroundTaskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
+//        self.backgroundTaskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
     }
     
     
@@ -90,9 +90,10 @@ class TimerModel:ObservableObject {
         guard let url = Bundle.main.url(forResource: bgmName, withExtension: "mp3") else { return }
         guard let data = try? Data(contentsOf: url) else { return }
         audioPlayer = try? AVAudioPlayer(data: data)
-        audioPlayer.enableRate = true
+        audioPlayer?.prepareToPlay()
         audioPlayer?.play()
-        
+        print(audioPlayer?.isPlaying ?? "none")
+        print(audioPlayer?.volume ?? "none")
     }
     
     func displayTimer() -> String {
@@ -135,7 +136,8 @@ class TimerModel:ObservableObject {
     
     func restartPomodoro() {
         timerStatus = .pomoroding
-        audioPlayer?.play()
+        let timeOffset = audioPlayer.deviceCurrentTime + 0.01
+        audioPlayer?.play(atTime: timeOffset)
     }
     
     func rest() {
@@ -167,7 +169,7 @@ class TimerModel:ObservableObject {
         duration = 0
         isDoing = false
         audioPlayer?.stop()
-        UIApplication.shared.endBackgroundTask(self.backgroundTaskId)
+//        UIApplication.shared.endBackgroundTask(self.backgroundTaskId)
     }
     
     func advancedTimer(room: Room) {
@@ -178,7 +180,7 @@ class TimerModel:ObservableObject {
         if duration > 0 {
             //残り時間から -0.05 する
             duration -= 0.05
-            print("duration: \(duration)")
+//            print("duration: \(duration)")
             //残り時間が0以下の場合
         } else {
             zeroTimeAction()
