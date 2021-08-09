@@ -66,9 +66,7 @@ struct TimerView: View {
             timerModel.advancedTimer(room: room)
         }//: onReceive
         .onAppear {
-            withAnimation(.easeOut(duration: 0.5)){
                 isAnimating = true
-            }
         }//: onAppear
     }//: BODY
 }
