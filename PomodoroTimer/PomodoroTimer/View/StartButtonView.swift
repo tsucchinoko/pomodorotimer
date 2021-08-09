@@ -15,8 +15,8 @@ struct StartButtonView: View {
     // MARK: - BODY
     var body: some View {
         Button(action: {
-            self.timerModel.setTimer(room: room)
             self.timerModel.pomodoro()
+            self.timerModel.setTimer(room: room)
             self.timerModel.displayStatus()
             self.timerModel.isDoing = true
             self.timerModel.playSound(bgmName: room.bgm)
