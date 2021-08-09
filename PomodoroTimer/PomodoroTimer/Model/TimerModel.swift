@@ -5,6 +5,7 @@
 //  Created by Daichi Tsuchiya on 2021/07/22.
 //
 
+import Foundation
 import SwiftUI
 import AudioToolbox
 import AVKit
@@ -80,6 +81,7 @@ class TimerModel:ObservableObject {
         
         maxValue = duration
         self.room = room
+        
         
 //        self.backgroundTaskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
     }

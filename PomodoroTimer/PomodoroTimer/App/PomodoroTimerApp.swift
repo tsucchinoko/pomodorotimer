@@ -17,20 +17,19 @@ struct PomodoroTimerApp: App {
         }
     }
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        let session = AVAudioSession.sharedInstance()
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        // Get the singleton instance.
+        let audioSession = AVAudioSession.sharedInstance()
         do {
-            try session.setCategory(.playback, mode: .default)
+            // Set the audio session category, mode, and options.
+            try audioSession.setCategory(.playback, mode: .moviePlayback, options: [])
         } catch {
-            fatalError("Cateogry設定失敗")
+            print("Failed to set audio session category.")
         }
-
-        do {
-            try session.setActive(true)
-        } catch {
-            fatalError("Session失敗")
-        }
-
+        
+        // Other post-launch configuration.
         return true
     }
 
