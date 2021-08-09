@@ -67,6 +67,8 @@ class TimerModel:ObservableObject {
     //1秒ごとに発動するタイマークラスのパブリッシュメソッド
     var timer = Timer.publish(every: 0.05, on: .main, in: .common).autoconnect()
     
+    var audioSession = AVAudioSession.sharedInstance()
+    
 //    var backgroundTaskId = UIBackgroundTaskIdentifier.init(rawValue: 0)
     
     var audioPlayer: AVAudioPlayer!
@@ -90,6 +92,14 @@ class TimerModel:ObservableObject {
     
     
     func playSound(bgmName: String) {
+        
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            // Set the audio session category, mode, and options.
+            try audioSession.setCategory(.playback, mode: .default, options: [])
+        } catch {
+            print("Failed to set audio session category.")
+        }
 
         guard let url = Bundle.main.url(forResource: bgmName, withExtension: "mp3") else { return }
         guard let data = try? Data(contentsOf: url) else { return }
