@@ -79,6 +79,8 @@ class TimerModel:ObservableObject {
             duration = Double((restMinSelection + 1) * 60)
         }
         
+        print(duration)
+        
         maxValue = duration
         self.room = room
         
@@ -93,9 +95,9 @@ class TimerModel:ObservableObject {
         guard let data = try? Data(contentsOf: url) else { return }
         audioPlayer = try? AVAudioPlayer(data: data)
         audioPlayer?.prepareToPlay()
+        audioPlayer?.volume = 1.0
+        audioPlayer?.numberOfLoops = -1
         audioPlayer?.play()
-        print(audioPlayer?.isPlaying ?? "none")
-        print(audioPlayer?.volume ?? "none")
     }
     
     func displayTimer() -> String {
@@ -150,6 +152,9 @@ class TimerModel:ObservableObject {
     
     func restartResting() {
         timerStatus = .resting
+        
+        let timeOffset = audioPlayer.deviceCurrentTime + 0.01
+        audioPlayer?.play(atTime: timeOffset)
         audioPlayer?.play()
     }
     
