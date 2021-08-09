@@ -146,7 +146,7 @@ class TimerModel:ObservableObject {
     
     func rest() {
         timerStatus = .resting
-        playSound(bgmName: "休憩")
+        playSound(bgmName: "rest")
         audioPlayer?.play()
     }
     
