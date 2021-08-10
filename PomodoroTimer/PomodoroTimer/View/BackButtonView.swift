@@ -23,8 +23,6 @@ struct BackButtonView: View {
         .onTapGesture {
             self.timerModel.isSetting = false
             presentationMode.wrappedValue.dismiss()
-            print("tapped!!")
-            print("isSetting  \(timerModel.isSetting)")
         }
     }
 }
