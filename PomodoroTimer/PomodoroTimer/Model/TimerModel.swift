@@ -94,9 +94,6 @@ class TimerModel:ObservableObject {
         }
         
         maxValue = duration
-        self.room = room
-        
-        
 //        self.backgroundTaskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
     }
     

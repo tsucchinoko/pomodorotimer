@@ -15,6 +15,7 @@ struct StartButtonView: View {
     // MARK: - BODY
     var body: some View {
         Button(action: {
+            self.timerModel.room = room
             self.timerModel.pomodoro()
             self.timerModel.setTimer(room: room)
             self.timerModel.startTimer()
