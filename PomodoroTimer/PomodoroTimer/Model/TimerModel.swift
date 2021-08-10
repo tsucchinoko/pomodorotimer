@@ -144,7 +144,10 @@ class TimerModel:ObservableObject {
     }
     
     func pomodoro() {
+        audioPlayer?.stop()
+        
         timerStatus = .pomoroding
+        playSound(bgmName: room.bgm)
         audioPlayer?.play()
     }
     
@@ -155,6 +158,8 @@ class TimerModel:ObservableObject {
     }
     
     func rest() {
+        audioPlayer?.stop()
+        
         timerStatus = .resting
         playSound(bgmName: "rest")
         audioPlayer?.play()
@@ -165,7 +170,6 @@ class TimerModel:ObservableObject {
         
         let timeOffset = audioPlayer.deviceCurrentTime + 0.01
         audioPlayer?.play(atTime: timeOffset)
-        audioPlayer?.play()
     }
     
     func pause() {

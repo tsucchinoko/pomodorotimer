@@ -19,7 +19,6 @@ struct StartButtonView: View {
             self.timerModel.setTimer(room: room)
             self.timerModel.displayStatus()
             self.timerModel.isDoing = true
-            self.timerModel.playSound(bgmName: room.bgm)
         }) {
             HStack(spacing: 8) {
                 Text("開始")
