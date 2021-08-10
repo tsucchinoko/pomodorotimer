@@ -62,9 +62,9 @@ struct TimerView: View {
         .frame(minWidth: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxWidth: .infinity, minHeight: 0,  maxHeight: .infinity, alignment: .center)
 
         //指定した時間（1秒）ごとに発動するtimerをトリガーにしてクロージャ内のコードを実行
-        .onReceive(self.timerModel.timer) { _ in
-            timerModel.advancedTimer(room: room)
-        }//: onReceive
+//        .onReceive(self.timerModel.timer) { _ in
+//            timerModel.advancedTimer(room: room)
+//        }//: onReceive
         .onAppear {
                 isAnimating = true
         }//: onAppear

@@ -17,6 +17,7 @@ struct StartButtonView: View {
         Button(action: {
             self.timerModel.pomodoro()
             self.timerModel.setTimer(room: room)
+            self.timerModel.startTimer()
             self.timerModel.displayStatus()
             self.timerModel.isDoing = true
         }) {

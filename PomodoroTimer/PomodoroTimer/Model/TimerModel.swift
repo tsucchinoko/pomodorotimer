@@ -7,8 +7,7 @@
 
 import Foundation
 import SwiftUI
-import AudioToolbox
-import AVKit
+import AVFoundation
 
 // MARK: - TIMER_MODEL
 class TimerModel:ObservableObject {
@@ -64,8 +63,10 @@ class TimerModel:ObservableObject {
     //モーダル表示
     @Published var isSetting: Bool = false
     
+    @Published var timer: Timer!
+    
     //1秒ごとに発動するタイマークラスのパブリッシュメソッド
-    var timer = Timer.publish(every: 0.05, on: .main, in: .common).autoconnect()
+//    var timer = Timer.publish(every: 0.05, on: .main, in: .common).autoconnect()
     
     var audioSession = AVAudioSession.sharedInstance()
     
@@ -74,14 +75,23 @@ class TimerModel:ObservableObject {
     var audioPlayer: AVAudioPlayer!
     var room: Room = roomData[0]
     
+    func startTimer() {
+        
+        self.timer?.invalidate()
+        self.timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true){ _ in
+            self.advancedTimer(room: self.room)
+        }
+        RunLoop.current.add(timer, forMode: .common)
+        
+    }
+    
+    
     func setTimer(room: Room) {
         if timerStatus == .pomoroding {
             duration = Double((minSelection + 1) * 60)
         } else {
             duration = Double((restMinSelection + 1) * 60)
         }
-        
-        print(duration)
         
         maxValue = duration
         self.room = room
@@ -187,7 +197,9 @@ class TimerModel:ObservableObject {
     
     func stop() {
         timerStatus = .stopping
-        duration = 0
+        self.timer?.invalidate()
+        timer = nil
+        self.duration = 0
         isDoing = false
         audioPlayer?.stop()
 //        UIApplication.shared.endBackgroundTask(self.backgroundTaskId)
