@@ -20,13 +20,13 @@ struct SettingsView: View {
             Form {
                 Section(header: Text("BGM:").font(.system(.body, design: .monospaced))) {
                     Toggle(isOn: $timerModel.isBGMOn) {
-                        Text("BGM Sound").font(.system(.body, design: .monospaced))
+                        Text("BGM音のON/OFF").font(.system(.body, design: .monospaced))
                     }
-                    Toggle(isOn: $timerModel.isRestBGMOn) {
-                        Text("REST BGM Sound").font(.system(.body, design: .monospaced))
-                    }
+//                    Toggle(isOn: $timerModel.isRestBGMOn) {
+//                        Text("REST BGM Sound").font(.system(.body, design: .monospaced))
+//                    }
                     Toggle(isOn: $timerModel.isVibrationOn) {
-                        Text("Vibration").font(.system(.body, design: .monospaced))
+                        Text("振動のON/OFF").font(.system(.body, design: .monospaced))
                     }
                     
 //                    //サウンド選択画面へ画面遷移 TODO
@@ -43,7 +43,7 @@ struct SettingsView: View {
                     Button(action: {
                         //タップしたらモーダルを閉じる
                         print("tapped 保存ボタン")
-                        timerModel.hideSettingsView()
+                        timerModel.hideSettingsView(isBGMOn: timerModel.isBGMOn, isVibrationOn: timerModel.isVibrationOn)
                     }) {
                         HStack {
                             Spacer()

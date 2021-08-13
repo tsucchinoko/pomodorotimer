@@ -36,31 +36,23 @@ class TimerModel:ObservableObject {
     
     //サウンドID
     @Published var soundID: SystemSoundID = 1151
-
-    //アラーム名
-    @Published var soundName: String = "Beat"
     
-    
-    
-    //音のOn/Off
+    //BGM音のOn/Off
     @Published var isBGMOn: Bool = true
     
     @Published var isRestBGMOn: Bool = true
     //バイブレーションのOn/Off
     @Published var isVibrationOn: Bool = true
-    //プログレスバー表示のOn/Off
-    @Published var isProgressBarOn: Bool = true
-    //エフェクトアニメーションのOn/Off
-    @Published var isEffectAnimationOn: Bool = true
     
-    // 入室
+    // 入室中
     @Published var isEntering: Bool = false
     
     // ポモドーロ中
     @Published var isDoing: Bool = false
     
+    // 終了画面のモーダル表示
     @Published var isFinished: Bool = false
-    //モーダル表示
+    // 設定画面のモーダル表示
     @Published var isSetting: Bool = false
     
     @Published var timer: Timer!
@@ -109,6 +101,9 @@ class TimerModel:ObservableObject {
             print("Failed to set audio session category.")
         }
 
+        guard isBGMOn else { return }
+        print(isBGMOn)
+        
         guard let url = Bundle.main.url(forResource: bgmName, withExtension: "mp3") else { return }
         guard let data = try? Data(contentsOf: url) else { return }
         audioPlayer = try? AVAudioPlayer(data: data)
@@ -147,8 +142,10 @@ class TimerModel:ObservableObject {
         isSetting = true
     }
     
-    func hideSettingsView() {
+    func hideSettingsView(isBGMOn: Bool, isVibrationOn: Bool) {
         isSetting = false
+        self.isBGMOn = isBGMOn
+        self.isVibrationOn = isVibrationOn
     }
     
     func setCount()  {
@@ -246,6 +243,8 @@ class TimerModel:ObservableObject {
                     //タイマーステータスを.stoppimgに変更する
                     isFinished = true
                     stop()
+                    
+                    guard isVibrationOn else { return }
                     //アラーム音を鳴らす
                     AudioServicesPlayAlertSoundWithCompletion(soundID, nil)
                     //バイブレーションを作動させる
