@@ -73,6 +73,7 @@ class TimerModel:ObservableObject {
 //    var backgroundTaskId = UIBackgroundTaskIdentifier.init(rawValue: 0)
     
     var audioPlayer: AVAudioPlayer!
+    @Published var bgmDuration: TimeInterval = 0.0
     var room: Room = roomData[0]
     
     func startTimer() {
@@ -111,10 +112,14 @@ class TimerModel:ObservableObject {
         guard let url = Bundle.main.url(forResource: bgmName, withExtension: "mp3") else { return }
         guard let data = try? Data(contentsOf: url) else { return }
         audioPlayer = try? AVAudioPlayer(data: data)
-        audioPlayer?.prepareToPlay()
-        audioPlayer?.volume = 1.0
+        bgmDuration = audioPlayer.duration
+        audioPlayer?.currentTime = 0
+        audioPlayer?.volume = 0.0
         audioPlayer?.numberOfLoops = -1
         audioPlayer?.play()
+        audioPlayer?.setVolume(0.5, fadeDuration: 5.0)
+//        audioPlayer?.setVolume(0.0, fadeDuration: 1.0)
+        print(bgmDuration)
     }
     
     func displayTimer() -> String {
@@ -206,10 +211,17 @@ class TimerModel:ObservableObject {
         //タイマーステータスが.running以外の場合何も実行しない
         guard timerStatus == .pomoroding || timerStatus == .resting else { return }
         
+
+        
         //残り時間が0より大きい場合
         if duration > 0 {
             //残り時間から -0.05 する
             duration -= 0.05
+            
+            // 残り時間が5秒以下ならフェードアウト
+            if duration < 5 {
+                audioPlayer?.setVolume(0, fadeDuration: 5.0)
+            }
 //            print("duration: \(duration)")
             //残り時間が0以下の場合
         } else {
