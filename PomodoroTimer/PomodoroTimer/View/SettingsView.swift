@@ -13,20 +13,19 @@ struct SettingsView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var timerModel: TimerModel
     
+    let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+    
     var body: some View {
         //Form内から別のFormやListに遷移可能
         NavigationView {
             //リスト表示のコンポーネントはFormかList（設定はForm、　TODOはListが多い）
             Form {
-                Section(header: Text("BGM:").font(.system(.body, design: .monospaced))) {
+                Section(header: Text("オーディオ設定").font(.system(.body, design: .monospaced))) {
                     Toggle(isOn: $timerModel.isBGMOn) {
-                        Text("BGM音のON/OFF").font(.system(.body, design: .monospaced))
+                        Text("音を鳴らす").font(.system(.body, design: .monospaced))
                     }
-//                    Toggle(isOn: $timerModel.isRestBGMOn) {
-//                        Text("REST BGM Sound").font(.system(.body, design: .monospaced))
-//                    }
                     Toggle(isOn: $timerModel.isVibrationOn) {
-                        Text("振動のON/OFF").font(.system(.body, design: .monospaced))
+                        Text("バイブさせる").font(.system(.body, design: .monospaced))
                     }
                     
 //                    //サウンド選択画面へ画面遷移 TODO
@@ -37,24 +36,57 @@ struct SettingsView: View {
 //                            Text("\(timerModel.soundName)")
 //                        }
 //                    }//: NAV LINK
+                }//: SECTION
+                Section(header: Text("アプリ情報").font(.system(.body, design: .monospaced))) {
+                    HStack {
+                        Image("twitter")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                        Link("開発者(Twitter)", destination: URL(string: "https://twitter.com/tsuchiiinoko21")!)
+                        Spacer()
+                        Image(systemName: "arrow.up.forward.app.fill")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                    }
+                    HStack {
+                        Image(systemName: "star.fill")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                        Link("アプリの評価", destination: URL(string: "https://twitter.com/tsuchiiinoko21")!)
+                        Spacer()
+                        Image(systemName: "arrow.up.forward.app.fill")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                    }
+                    HStack {
+                        Image(systemName: "hammer.fill")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                        Link("フィードバックを送信", destination: URL(string: "https://twitter.com/tsuchiiinoko21")!)
+                        Spacer()
+                        Image(systemName: "arrow.up.forward.app.fill")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                    }
+                    HStack {
+                        Text("バージョン:")
+                        Spacer()
+                        Text(version)
+                    }
                 }
-                
-                Section(header: Text("保存:").font(.system(.body, design: .monospaced))) {
                     Button(action: {
                         //タップしたらモーダルを閉じる
-                        print("tapped 保存ボタン")
                         timerModel.hideSettingsView(isBGMOn: timerModel.isBGMOn, isVibrationOn: timerModel.isVibrationOn)
                     }) {
                         HStack {
                             Spacer()
-                            Text("Done!")
+                            Text("保存")
                                 .font(.system(.body, design: .monospaced))
                             Image(systemName: "checkmark.circle")
                             Spacer()
-                        }
+                        }//: HSTACK
                         
                     }
-                }
             }
         }
     }
@@ -63,5 +95,6 @@ struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView()
+            .environmentObject(TimerModel())
     }
 }
