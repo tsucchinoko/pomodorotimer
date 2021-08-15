@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct RoomCardView: View {
     
@@ -33,6 +34,19 @@ struct RoomCardView: View {
             }
                 
         }//: ZSTACK
+        .onAppear(){
+            //通知許諾ウィンドウ表示(初回だけ)
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound]){
+                    (granted, _) in
+                    if granted {
+                        //通知が許可されているときの処理
+                        timerModel.granted = true
+                    }else {
+                        //通知が拒否されているときの処理
+                        timerModel.granted = false
+                    }
+                }
+        }
         .frame(minWidth: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxWidth: .infinity, minHeight: 0,  maxHeight: .infinity, alignment: .center)
         .cornerRadius(20.0)
         .padding(.horizontal, 20)

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import AVFoundation
+import UserNotifications
 
 // MARK: - TIMER_MODEL
 class TimerModel:ObservableObject {
@@ -61,6 +62,7 @@ class TimerModel:ObservableObject {
     var audioSession = AVAudioSession.sharedInstance()
     var audioPlayer: AVAudioPlayer!
     var room: Room = roomData[0]
+    var granted: Bool = false
     
     func startTimer() {
 
@@ -243,9 +245,31 @@ class TimerModel:ObservableObject {
                     AudioServicesPlayAlertSoundWithCompletion(soundID, nil)
                     //バイブレーションを作動させる
                     AudioServicesPlayAlertSoundWithCompletion(SystemSoundID(kSystemSoundID_Vibrate)) {}
+                    
+                    guard granted else { return }
+                    makeNotification()
                 }
             default:
                 return
         }
     }
+    
+    
+    //①通知関係のメソッド作成
+   func makeNotification(){
+        //②通知タイミングを指定
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+
+        //③通知コンテンツの作成
+        let content = UNMutableNotificationContent()
+        content.title = "終了！"
+        content.body = "よく頑張りました！"
+        content.sound = UNNotificationSound.default
+
+        //④通知タイミングと通知内容をまとめてリクエストを作成。
+        let request = UNNotificationRequest(identifier: "notification001", content: content, trigger: trigger)
+
+        //⑤④のリクエストの通りに通知を実行させる
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+   }
 }
