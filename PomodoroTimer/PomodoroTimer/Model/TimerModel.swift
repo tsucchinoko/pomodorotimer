@@ -101,8 +101,8 @@ class TimerModel:ObservableObject {
             print("Failed to set audio session category.")
         }
 
-        guard isBGMOn else { return }
         print(isBGMOn)
+        guard isBGMOn else { return }
         
         guard let url = Bundle.main.url(forResource: bgmName, withExtension: "mp3") else { return }
         guard let data = try? Data(contentsOf: url) else { return }
@@ -146,6 +146,7 @@ class TimerModel:ObservableObject {
         isSetting = false
         self.isBGMOn = isBGMOn
         self.isVibrationOn = isVibrationOn
+        print("hideSettings is called!!")
     }
     
     func setCount()  {
@@ -157,7 +158,6 @@ class TimerModel:ObservableObject {
         
         timerStatus = .pomoroding
         playSound(bgmName: room.bgm)
-        audioPlayer?.play()
     }
     
     func restartPomodoro() {
@@ -171,7 +171,6 @@ class TimerModel:ObservableObject {
         
         timerStatus = .resting
         playSound(bgmName: "rest")
-        audioPlayer?.play()
     }
     
     func restartResting() {

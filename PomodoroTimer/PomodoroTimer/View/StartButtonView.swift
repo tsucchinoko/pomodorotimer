@@ -15,12 +15,12 @@ struct StartButtonView: View {
     // MARK: - BODY
     var body: some View {
         Button(action: {
-            self.timerModel.room = room
-            self.timerModel.pomodoro()
-            self.timerModel.setTimer(room: room)
-            self.timerModel.startTimer()
-            self.timerModel.displayStatus()
-            self.timerModel.isDoing = true
+            timerModel.room = room
+            timerModel.pomodoro()
+            timerModel.setTimer(room: room)
+            timerModel.startTimer()
+            timerModel.displayStatus()
+            timerModel.isDoing = true
         }) {
             HStack(spacing: 8) {
                 Text("開始")
