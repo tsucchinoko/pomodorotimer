@@ -16,23 +16,4 @@ struct PomodoroTimerApp: App {
             ContentView().environmentObject(TimerModel())
         }
     }
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        let session = AVAudioSession.sharedInstance()
-        do {
-            try session.setCategory(.playback, mode: .default)
-        } catch {
-            fatalError("Cateogry設定失敗")
-        }
-
-        do {
-            try session.setActive(true)
-        } catch {
-            fatalError("Session失敗")
-        }
-
-        return true
-    }
-
-
 }

@@ -33,7 +33,6 @@ struct FinishPomodoroView: View {
         .onDisappear() {
             withAnimation(.easeOut(duration: 0.5)){
                 isAnimating = true
-                timerModel.isFinished = false
             }
         }//: onAppear
         .frame(minWidth: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxWidth: .infinity, minHeight: 0,  maxHeight: .infinity, alignment: .center)

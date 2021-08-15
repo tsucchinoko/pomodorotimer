@@ -5,9 +5,10 @@
 //  Created by Daichi Tsuchiya on 2021/07/22.
 //
 
+import Foundation
 import SwiftUI
-import AudioToolbox
-import AVKit
+import AVFoundation
+import UserNotifications
 
 // MARK: - TIMER_MODEL
 class TimerModel:ObservableObject {
@@ -20,9 +21,9 @@ class TimerModel:ObservableObject {
     @Published var countSelection: Int = 0
     
     //カウントダウン残り時間
-    @Published var duration: Double = 0.0
+    @Published var duration: Float = 0.0
     //カウントダウン開始前の最大時間
-    @Published var maxValue: Double = 0.0
+    @Published var maxValue: Float = 0.0
     
     // セット回数
     @Published var count: Int = 0
@@ -32,68 +33,78 @@ class TimerModel:ObservableObject {
     
     //タイマーのステータス
     @Published var timerStatus: TimerStatus = .stopping
+    
     @Published var beforePausingStatus: TimerStatus = .pomoroding
     
     //サウンドID
     @Published var soundID: SystemSoundID = 1151
-
-    //アラーム名
-    @Published var soundName: String = "Beat"
     
-    
-    
-    //音のOn/Off
+    //BGM音のOn/Off
     @Published var isBGMOn: Bool = true
     
     @Published var isRestBGMOn: Bool = true
     //バイブレーションのOn/Off
     @Published var isVibrationOn: Bool = true
-    //プログレスバー表示のOn/Off
-    @Published var isProgressBarOn: Bool = true
-    //エフェクトアニメーションのOn/Off
-    @Published var isEffectAnimationOn: Bool = true
     
-    // 入室
+    // 入室中
     @Published var isEntering: Bool = false
     
     // ポモドーロ中
     @Published var isDoing: Bool = false
     
+    // 終了画面のモーダル表示
     @Published var isFinished: Bool = false
-    //モーダル表示
+    // 設定画面のモーダル表示
     @Published var isSetting: Bool = false
     
-    //1秒ごとに発動するタイマークラスのパブリッシュメソッド
-    var timer = Timer.publish(every: 0.05, on: .main, in: .common).autoconnect()
+    @Published var timer: Timer!
     
-//    var backgroundTaskId = UIBackgroundTaskIdentifier.init(rawValue: 0)
-    
+    var audioSession = AVAudioSession.sharedInstance()
     var audioPlayer: AVAudioPlayer!
     var room: Room = roomData[0]
+    var granted: Bool = false
+    
+    func startTimer() {
+
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true){ _ in
+            self.advancedTimer(room: self.room)
+        }
+        
+    }
+    
     
     func setTimer(room: Room) {
         if timerStatus == .pomoroding {
-            duration = Double((minSelection + 1) * 60)
+            duration = Float((minSelection + 1) * 60)
         } else {
-            duration = Double((restMinSelection + 1) * 60)
+            duration = Float((restMinSelection + 1) * 60)
         }
         
         maxValue = duration
-        self.room = room
-        
-//        self.backgroundTaskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
     }
     
     
     func playSound(bgmName: String) {
+        
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            // Set the audio session category, mode, and options.
+            try audioSession.setCategory(.playback, mode: .default, options: [])
+        } catch {
+            print("Failed to set audio session category.")
+        }
 
+        guard isBGMOn else { return }
+        
         guard let url = Bundle.main.url(forResource: bgmName, withExtension: "mp3") else { return }
         guard let data = try? Data(contentsOf: url) else { return }
         audioPlayer = try? AVAudioPlayer(data: data)
-        audioPlayer?.prepareToPlay()
+        audioPlayer?.currentTime = 0
+        audioPlayer?.volume = 0.0
+        audioPlayer?.numberOfLoops = -1
         audioPlayer?.play()
-        print(audioPlayer?.isPlaying ?? "none")
-        print(audioPlayer?.volume ?? "none")
+        audioPlayer?.setVolume(0.5, fadeDuration: 5.0)
     }
     
     func displayTimer() -> String {
@@ -121,8 +132,10 @@ class TimerModel:ObservableObject {
         isSetting = true
     }
     
-    func hideSettingsView() {
+    func hideSettingsView(isBGMOn: Bool, isVibrationOn: Bool) {
         isSetting = false
+        self.isBGMOn = isBGMOn
+        self.isVibrationOn = isVibrationOn
     }
     
     func setCount()  {
@@ -130,25 +143,33 @@ class TimerModel:ObservableObject {
     }
     
     func pomodoro() {
+        audioPlayer?.stop()
+        
         timerStatus = .pomoroding
-        audioPlayer?.play()
+        playSound(bgmName: room.bgm)
     }
     
     func restartPomodoro() {
         timerStatus = .pomoroding
         let timeOffset = audioPlayer.deviceCurrentTime + 0.01
+        
+        guard isBGMOn else { return }
         audioPlayer?.play(atTime: timeOffset)
     }
     
     func rest() {
+        audioPlayer?.stop()
+        
         timerStatus = .resting
-        playSound(bgmName: "休憩")
-        audioPlayer?.play()
+        playSound(bgmName: "rest")
     }
     
     func restartResting() {
         timerStatus = .resting
-        audioPlayer?.play()
+        let timeOffset = audioPlayer.deviceCurrentTime + 0.01
+        
+        guard isBGMOn else { return }
+        audioPlayer?.play(atTime: timeOffset)
     }
     
     func pause() {
@@ -167,9 +188,17 @@ class TimerModel:ObservableObject {
     func stop() {
         timerStatus = .stopping
         duration = 0
+        maxValue = 0
+        minSelection = 0
+        restMinSelection = 0
+        countSelection = 0
+        count = 0
+        
         isDoing = false
         audioPlayer?.stop()
-//        UIApplication.shared.endBackgroundTask(self.backgroundTaskId)
+        
+        timer?.invalidate()
+        timer = nil
     }
     
     func advancedTimer(room: Room) {
@@ -180,6 +209,12 @@ class TimerModel:ObservableObject {
         if duration > 0 {
             //残り時間から -0.05 する
             duration -= 0.05
+            print(duration)
+            
+            // 残り時間が5秒以下ならフェードアウト
+            if duration < 5 {
+                audioPlayer?.setVolume(0, fadeDuration: 5.0)
+            }
 //            print("duration: \(duration)")
             //残り時間が0以下の場合
         } else {
@@ -204,13 +239,37 @@ class TimerModel:ObservableObject {
                     //タイマーステータスを.stoppimgに変更する
                     isFinished = true
                     stop()
+                    
+                    guard isVibrationOn else { return }
                     //アラーム音を鳴らす
                     AudioServicesPlayAlertSoundWithCompletion(soundID, nil)
                     //バイブレーションを作動させる
                     AudioServicesPlayAlertSoundWithCompletion(SystemSoundID(kSystemSoundID_Vibrate)) {}
+                    
+                    guard granted else { return }
+                    makeNotification()
                 }
             default:
                 return
         }
     }
+    
+    
+    //①通知関係のメソッド作成
+   func makeNotification(){
+        //②通知タイミングを指定
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+
+        //③通知コンテンツの作成
+        let content = UNMutableNotificationContent()
+        content.title = "終了！"
+        content.body = "よく頑張りました！"
+        content.sound = UNNotificationSound.default
+
+        //④通知タイミングと通知内容をまとめてリクエストを作成。
+        let request = UNNotificationRequest(identifier: "notification001", content: content, trigger: trigger)
+
+        //⑤④のリクエストの通りに通知を実行させる
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+   }
 }

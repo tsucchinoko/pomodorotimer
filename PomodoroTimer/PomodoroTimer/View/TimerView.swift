@@ -60,15 +60,8 @@ struct TimerView: View {
         }//: ZSTACK
         .navigationBarHidden(true)
         .frame(minWidth: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxWidth: .infinity, minHeight: 0,  maxHeight: .infinity, alignment: .center)
-
-        //指定した時間（1秒）ごとに発動するtimerをトリガーにしてクロージャ内のコードを実行
-        .onReceive(self.timerModel.timer) { _ in
-            timerModel.advancedTimer(room: room)
-        }//: onReceive
         .onAppear {
-            withAnimation(.easeOut(duration: 0.5)){
                 isAnimating = true
-            }
         }//: onAppear
     }//: BODY
 }

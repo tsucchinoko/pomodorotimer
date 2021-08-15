@@ -33,16 +33,6 @@ struct ProgressBarView: View {
             //輪郭の表示位置を12時の方向にする
             .rotationEffect(Angle(degrees: -90))
         }
-        .onReceive(timerModel.timer) { _ in
-                    self.costomHueA += 0.005
-                    if self.costomHueA >= 1.0 {
-                        self.costomHueA = 0.0
-                    }
-                    self.customHueB += 0.005
-                    if self.customHueB >= 1.0 {
-                        self.customHueB = 0.0
-                    }
-                }
     }
     
     
