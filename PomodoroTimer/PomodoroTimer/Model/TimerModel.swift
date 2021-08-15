@@ -20,9 +20,9 @@ class TimerModel:ObservableObject {
     @Published var countSelection: Int = 0
     
     //カウントダウン残り時間
-    @Published var duration: Double = 0.0
+    @Published var duration: Float = 0.0
     //カウントダウン開始前の最大時間
-    @Published var maxValue: Double = 0.0
+    @Published var maxValue: Float = 0.0
     
     // セット回数
     @Published var count: Int = 0
@@ -32,6 +32,7 @@ class TimerModel:ObservableObject {
     
     //タイマーのステータス
     @Published var timerStatus: TimerStatus = .stopping
+    
     @Published var beforePausingStatus: TimerStatus = .pomoroding
     
     //サウンドID
@@ -58,33 +59,27 @@ class TimerModel:ObservableObject {
     @Published var timer: Timer!
     
     var audioSession = AVAudioSession.sharedInstance()
-    
-//    var backgroundTaskId = UIBackgroundTaskIdentifier.init(rawValue: 0)
-    
     var audioPlayer: AVAudioPlayer!
-    @Published var bgmDuration: TimeInterval = 0.0
     var room: Room = roomData[0]
     
     func startTimer() {
-        
-        self.timer?.invalidate()
-        self.timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true){ _ in
+
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true){ _ in
             self.advancedTimer(room: self.room)
         }
-        RunLoop.current.add(timer, forMode: .common)
         
     }
     
     
     func setTimer(room: Room) {
         if timerStatus == .pomoroding {
-            duration = Double((minSelection + 1) * 60)
+            duration = Float((minSelection + 1) * 60)
         } else {
-            duration = Double((restMinSelection + 1) * 60)
+            duration = Float((restMinSelection + 1) * 60)
         }
         
         maxValue = duration
-//        self.backgroundTaskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
     }
     
     
@@ -98,13 +93,11 @@ class TimerModel:ObservableObject {
             print("Failed to set audio session category.")
         }
 
-        print(isBGMOn)
         guard isBGMOn else { return }
         
         guard let url = Bundle.main.url(forResource: bgmName, withExtension: "mp3") else { return }
         guard let data = try? Data(contentsOf: url) else { return }
         audioPlayer = try? AVAudioPlayer(data: data)
-        bgmDuration = audioPlayer.duration
         audioPlayer?.currentTime = 0
         audioPlayer?.volume = 0.0
         audioPlayer?.numberOfLoops = -1
@@ -141,7 +134,6 @@ class TimerModel:ObservableObject {
         isSetting = false
         self.isBGMOn = isBGMOn
         self.isVibrationOn = isVibrationOn
-        print("hideSettings is called!!")
     }
     
     func setCount()  {
@@ -193,24 +185,29 @@ class TimerModel:ObservableObject {
     
     func stop() {
         timerStatus = .stopping
-        self.timer?.invalidate()
-        timer = nil
-        self.duration = 0
+        duration = 0
+        maxValue = 0
+        minSelection = 0
+        restMinSelection = 0
+        countSelection = 0
+        count = 0
+        
         isDoing = false
         audioPlayer?.stop()
-//        UIApplication.shared.endBackgroundTask(self.backgroundTaskId)
+        
+        timer?.invalidate()
+        timer = nil
     }
     
     func advancedTimer(room: Room) {
         //タイマーステータスが.running以外の場合何も実行しない
         guard timerStatus == .pomoroding || timerStatus == .resting else { return }
         
-
-        
         //残り時間が0より大きい場合
         if duration > 0 {
             //残り時間から -0.05 する
             duration -= 0.05
+            print(duration)
             
             // 残り時間が5秒以下ならフェードアウト
             if duration < 5 {
