@@ -57,9 +57,6 @@ class TimerModel:ObservableObject {
     
     @Published var timer: Timer!
     
-    //1秒ごとに発動するタイマークラスのパブリッシュメソッド
-//    var timer = Timer.publish(every: 0.05, on: .main, in: .common).autoconnect()
-    
     var audioSession = AVAudioSession.sharedInstance()
     
 //    var backgroundTaskId = UIBackgroundTaskIdentifier.init(rawValue: 0)
@@ -113,8 +110,6 @@ class TimerModel:ObservableObject {
         audioPlayer?.numberOfLoops = -1
         audioPlayer?.play()
         audioPlayer?.setVolume(0.5, fadeDuration: 5.0)
-//        audioPlayer?.setVolume(0.0, fadeDuration: 1.0)
-        print(bgmDuration)
     }
     
     func displayTimer() -> String {
@@ -163,6 +158,8 @@ class TimerModel:ObservableObject {
     func restartPomodoro() {
         timerStatus = .pomoroding
         let timeOffset = audioPlayer.deviceCurrentTime + 0.01
+        
+        guard isBGMOn else { return }
         audioPlayer?.play(atTime: timeOffset)
     }
     
@@ -175,8 +172,9 @@ class TimerModel:ObservableObject {
     
     func restartResting() {
         timerStatus = .resting
-        
         let timeOffset = audioPlayer.deviceCurrentTime + 0.01
+        
+        guard isBGMOn else { return }
         audioPlayer?.play(atTime: timeOffset)
     }
     
